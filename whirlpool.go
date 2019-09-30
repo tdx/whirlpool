@@ -26,6 +26,11 @@ func New() hash.Hash {
 	return new(whirlpool)
 }
 
+// NewRaw ...
+func NewRaw() *whirlpool {
+	return new(whirlpool)
+}
+
 func (w *whirlpool) Reset() {
 	// Cleanup the buffer.
 	w.buffer = [wblockBytes]byte{}
@@ -56,68 +61,207 @@ func (w *whirlpool) transform() {
 	)
 
 	// Map the buffer to a block.
-	for i := 0; i < 8; i++ {
-		b := 8 * i
-		block[i] = binary.BigEndian.Uint64(w.buffer[b:])
-	}
+	block[0] = binary.BigEndian.Uint64(w.buffer[0:])
+	block[1] = binary.BigEndian.Uint64(w.buffer[8:])
+	block[2] = binary.BigEndian.Uint64(w.buffer[16:])
+	block[3] = binary.BigEndian.Uint64(w.buffer[24:])
+	block[4] = binary.BigEndian.Uint64(w.buffer[32:])
+	block[5] = binary.BigEndian.Uint64(w.buffer[40:])
+	block[6] = binary.BigEndian.Uint64(w.buffer[48:])
+	block[7] = binary.BigEndian.Uint64(w.buffer[56:])
 
 	// Compute & apply K^0 to the cipher state.
-	for i := 0; i < 8; i++ {
-		K[i] = w.hash[i]
-		state[i] = block[i] ^ K[i]
-	}
+	K[0] = w.hash[0]
+	K[1] = w.hash[1]
+	K[2] = w.hash[2]
+	K[3] = w.hash[3]
+	K[4] = w.hash[4]
+	K[5] = w.hash[5]
+	K[6] = w.hash[6]
+	K[7] = w.hash[7]
+
+	state[0] = block[0] ^ K[0]
+	state[1] = block[1] ^ K[1]
+	state[2] = block[2] ^ K[2]
+	state[3] = block[3] ^ K[3]
+	state[4] = block[4] ^ K[4]
+	state[5] = block[5] ^ K[5]
+	state[6] = block[6] ^ K[6]
+	state[7] = block[7] ^ K[7]
 
 	// Iterate over all the rounds.
 	for r := 1; r <= rounds; r++ {
 		// Compute K^rounds from K^(rounds-1).
-		for i := 0; i < 8; i++ {
-			L[i] = _C0[byte(K[i%8]>>56)] ^
-				_C1[byte(K[(i+7)%8]>>48)] ^
-				_C2[byte(K[(i+6)%8]>>40)] ^
-				_C3[byte(K[(i+5)%8]>>32)] ^
-				_C4[byte(K[(i+4)%8]>>24)] ^
-				_C5[byte(K[(i+3)%8]>>16)] ^
-				_C6[byte(K[(i+2)%8]>>8)] ^
-				_C7[byte(K[(i+1)%8])]
-		}
+		L[0] = _C0[byte(K[0%8]>>56)] ^
+			_C1[byte(K[(0+7)%8]>>48)] ^
+			_C2[byte(K[(0+6)%8]>>40)] ^
+			_C3[byte(K[(0+5)%8]>>32)] ^
+			_C4[byte(K[(0+4)%8]>>24)] ^
+			_C5[byte(K[(0+3)%8]>>16)] ^
+			_C6[byte(K[(0+2)%8]>>8)] ^
+			_C7[byte(K[(0+1)%8])]
+		L[1] = _C0[byte(K[1%8]>>56)] ^
+			_C1[byte(K[(1+7)%8]>>48)] ^
+			_C2[byte(K[(1+6)%8]>>40)] ^
+			_C3[byte(K[(1+5)%8]>>32)] ^
+			_C4[byte(K[(1+4)%8]>>24)] ^
+			_C5[byte(K[(1+3)%8]>>16)] ^
+			_C6[byte(K[(1+2)%8]>>8)] ^
+			_C7[byte(K[(1+1)%8])]
+		L[2] = _C0[byte(K[2%8]>>56)] ^
+			_C1[byte(K[(2+7)%8]>>48)] ^
+			_C2[byte(K[(2+6)%8]>>40)] ^
+			_C3[byte(K[(2+5)%8]>>32)] ^
+			_C4[byte(K[(2+4)%8]>>24)] ^
+			_C5[byte(K[(2+3)%8]>>16)] ^
+			_C6[byte(K[(2+2)%8]>>8)] ^
+			_C7[byte(K[(2+1)%8])]
+		L[3] = _C0[byte(K[3%8]>>56)] ^
+			_C1[byte(K[(3+7)%8]>>48)] ^
+			_C2[byte(K[(3+6)%8]>>40)] ^
+			_C3[byte(K[(3+5)%8]>>32)] ^
+			_C4[byte(K[(3+4)%8]>>24)] ^
+			_C5[byte(K[(3+3)%8]>>16)] ^
+			_C6[byte(K[(3+2)%8]>>8)] ^
+			_C7[byte(K[(3+1)%8])]
+		L[4] = _C0[byte(K[4%8]>>56)] ^
+			_C1[byte(K[(4+7)%8]>>48)] ^
+			_C2[byte(K[(4+6)%8]>>40)] ^
+			_C3[byte(K[(4+5)%8]>>32)] ^
+			_C4[byte(K[(4+4)%8]>>24)] ^
+			_C5[byte(K[(4+3)%8]>>16)] ^
+			_C6[byte(K[(4+2)%8]>>8)] ^
+			_C7[byte(K[(4+1)%8])]
+		L[5] = _C0[byte(K[5%8]>>56)] ^
+			_C1[byte(K[(5+7)%8]>>48)] ^
+			_C2[byte(K[(5+6)%8]>>40)] ^
+			_C3[byte(K[(5+5)%8]>>32)] ^
+			_C4[byte(K[(5+4)%8]>>24)] ^
+			_C5[byte(K[(5+3)%8]>>16)] ^
+			_C6[byte(K[(5+2)%8]>>8)] ^
+			_C7[byte(K[(5+1)%8])]
+		L[6] = _C0[byte(K[6%8]>>56)] ^
+			_C1[byte(K[(6+7)%8]>>48)] ^
+			_C2[byte(K[(6+6)%8]>>40)] ^
+			_C3[byte(K[(6+5)%8]>>32)] ^
+			_C4[byte(K[(6+4)%8]>>24)] ^
+			_C5[byte(K[(6+3)%8]>>16)] ^
+			_C6[byte(K[(6+2)%8]>>8)] ^
+			_C7[byte(K[(6+1)%8])]
+		L[7] = _C0[byte(K[7%8]>>56)] ^
+			_C1[byte(K[(7+7)%8]>>48)] ^
+			_C2[byte(K[(7+6)%8]>>40)] ^
+			_C3[byte(K[(7+5)%8]>>32)] ^
+			_C4[byte(K[(7+4)%8]>>24)] ^
+			_C5[byte(K[(7+3)%8]>>16)] ^
+			_C6[byte(K[(7+2)%8]>>8)] ^
+			_C7[byte(K[(7+1)%8])]
 		L[0] ^= rc[r]
 
-		for i := 0; i < 8; i++ {
-			K[i] = L[i]
-		}
+		K[0] = L[0]
+		K[1] = L[1]
+		K[2] = L[2]
+		K[3] = L[3]
+		K[4] = L[4]
+		K[5] = L[5]
+		K[6] = L[6]
+		K[7] = L[7]
 
 		// Apply r-th round transformation.
-		for i := 0; i < 8; i++ {
-			L[i] = _C0[byte(state[i%8]>>56)] ^
-				_C1[byte(state[(i+7)%8]>>48)] ^
-				_C2[byte(state[(i+6)%8]>>40)] ^
-				_C3[byte(state[(i+5)%8]>>32)] ^
-				_C4[byte(state[(i+4)%8]>>24)] ^
-				_C5[byte(state[(i+3)%8]>>16)] ^
-				_C6[byte(state[(i+2)%8]>>8)] ^
-				_C7[byte(state[(i+1)%8])] ^
-				K[i%8]
-		}
+		L[0] = _C0[byte(state[0%8]>>56)] ^
+			_C1[byte(state[(0+7)%8]>>48)] ^
+			_C2[byte(state[(0+6)%8]>>40)] ^
+			_C3[byte(state[(0+5)%8]>>32)] ^
+			_C4[byte(state[(0+4)%8]>>24)] ^
+			_C5[byte(state[(0+3)%8]>>16)] ^
+			_C6[byte(state[(0+2)%8]>>8)] ^
+			_C7[byte(state[(0+1)%8])] ^ K[0%8]
+		L[1] = _C0[byte(state[1%8]>>56)] ^
+			_C1[byte(state[(1+7)%8]>>48)] ^
+			_C2[byte(state[(1+6)%8]>>40)] ^
+			_C3[byte(state[(1+5)%8]>>32)] ^
+			_C4[byte(state[(1+4)%8]>>24)] ^
+			_C5[byte(state[(1+3)%8]>>16)] ^
+			_C6[byte(state[(1+2)%8]>>8)] ^
+			_C7[byte(state[(1+1)%8])] ^ K[1%8]
+		L[2] = _C0[byte(state[2%8]>>56)] ^
+			_C1[byte(state[(2+7)%8]>>48)] ^
+			_C2[byte(state[(2+6)%8]>>40)] ^
+			_C3[byte(state[(2+5)%8]>>32)] ^
+			_C4[byte(state[(2+4)%8]>>24)] ^
+			_C5[byte(state[(2+3)%8]>>16)] ^
+			_C6[byte(state[(2+2)%8]>>8)] ^
+			_C7[byte(state[(2+1)%8])] ^ K[2%8]
+		L[3] = _C0[byte(state[3%8]>>56)] ^
+			_C1[byte(state[(3+7)%8]>>48)] ^
+			_C2[byte(state[(3+6)%8]>>40)] ^
+			_C3[byte(state[(3+5)%8]>>32)] ^
+			_C4[byte(state[(3+4)%8]>>24)] ^
+			_C5[byte(state[(3+3)%8]>>16)] ^
+			_C6[byte(state[(3+2)%8]>>8)] ^
+			_C7[byte(state[(3+1)%8])] ^ K[3%8]
+		L[4] = _C0[byte(state[4%8]>>56)] ^
+			_C1[byte(state[(4+7)%8]>>48)] ^
+			_C2[byte(state[(4+6)%8]>>40)] ^
+			_C3[byte(state[(4+5)%8]>>32)] ^
+			_C4[byte(state[(4+4)%8]>>24)] ^
+			_C5[byte(state[(4+3)%8]>>16)] ^
+			_C6[byte(state[(4+2)%8]>>8)] ^
+			_C7[byte(state[(4+1)%8])] ^ K[4%8]
+		L[5] = _C0[byte(state[5%8]>>56)] ^
+			_C1[byte(state[(5+7)%8]>>48)] ^
+			_C2[byte(state[(5+6)%8]>>40)] ^
+			_C3[byte(state[(5+5)%8]>>32)] ^
+			_C4[byte(state[(5+4)%8]>>24)] ^
+			_C5[byte(state[(5+3)%8]>>16)] ^
+			_C6[byte(state[(5+2)%8]>>8)] ^
+			_C7[byte(state[(5+1)%8])] ^ K[5%8]
+		L[6] = _C0[byte(state[6%8]>>56)] ^
+			_C1[byte(state[(6+7)%8]>>48)] ^
+			_C2[byte(state[(6+6)%8]>>40)] ^
+			_C3[byte(state[(6+5)%8]>>32)] ^
+			_C4[byte(state[(6+4)%8]>>24)] ^
+			_C5[byte(state[(6+3)%8]>>16)] ^
+			_C6[byte(state[(6+2)%8]>>8)] ^
+			_C7[byte(state[(6+1)%8])] ^ K[6%8]
+		L[7] = _C0[byte(state[7%8]>>56)] ^
+			_C1[byte(state[(7+7)%8]>>48)] ^
+			_C2[byte(state[(7+6)%8]>>40)] ^
+			_C3[byte(state[(7+5)%8]>>32)] ^
+			_C4[byte(state[(7+4)%8]>>24)] ^
+			_C5[byte(state[(7+3)%8]>>16)] ^
+			_C6[byte(state[(7+2)%8]>>8)] ^
+			_C7[byte(state[(7+1)%8])] ^ K[7%8]
 
-		for i := 0; i < 8; i++ {
-			state[i] = L[i]
-		}
+		state[0] = L[0]
+		state[1] = L[1]
+		state[2] = L[2]
+		state[3] = L[3]
+		state[4] = L[4]
+		state[5] = L[5]
+		state[6] = L[6]
+		state[7] = L[7]
 	}
 
 	// Apply the Miyaguchi-Preneel compression function.
-	for i := 0; i < 8; i++ {
-		w.hash[i] ^= state[i] ^ block[i]
-	}
+	w.hash[0] ^= state[0] ^ block[0]
+	w.hash[1] ^= state[1] ^ block[1]
+	w.hash[2] ^= state[2] ^ block[2]
+	w.hash[3] ^= state[3] ^ block[3]
+	w.hash[4] ^= state[4] ^ block[4]
+	w.hash[5] ^= state[5] ^ block[5]
+	w.hash[6] ^= state[6] ^ block[6]
+	w.hash[7] ^= state[7] ^ block[7]
 }
 
 func (w *whirlpool) Write(source []byte) (int, error) {
 	var (
-		sourcePos  int                                            // Index of the leftmost source.
-		nn         int    = len(source)                           // Num of bytes to process.
-		sourceBits uint64 = uint64(nn * 8)                        // Num of bits to process.
-		sourceGap  uint   = uint((8 - (int(sourceBits & 7))) & 7) // Space on source[sourcePos].
-		bufferRem  uint   = uint(w.bufferBits & 7)                // Occupied bits on buffer[bufferPos].
-		b          uint32                                         // Current byte.
+		sourcePos  int                                     // Index of the leftmost source.
+		nn         = len(source)                           // Num of bytes to process.
+		sourceBits = uint64(nn * 8)                        // Num of bits to process.
+		sourceGap  = uint((8 - (int(sourceBits & 7))) & 7) // Space on source[sourcePos].
+		bufferRem  = uint(w.bufferBits & 7)                // Occupied bits on buffer[bufferPos].
+		b          uint32                                  // Current byte.
 	)
 
 	// Tally the length of the data added.

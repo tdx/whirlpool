@@ -6,10 +6,14 @@ package whirlpool_test
 
 import (
 	"fmt"
+	"hash"
 	"io"
+	"math/rand"
 	"testing"
 
-	"github.com/jzelinskie/whirlpool"
+	"github.com/tdx/whirlpool"
+
+	jzw "github.com/jzelinskie/whirlpool"
 )
 
 type whirlpoolTest struct {
@@ -78,4 +82,23 @@ func ExampleNew() {
 	fmt.Printf("% x", h.Sum(nil))
 	// Output:
 	// 63 6c e4 b3 3a 67 4a af 0b b4 e2 37 1d 85 b1 16 01 9d 57 08 dc 64 34 f6 db 9a 45 51 51 98 1f 2c 36 d7 c5 00 b0 40 af 09 ec 2d 5a 39 40 18 eb 65 6a e2 13 56 56 43 18 a0 fe 8f 0d 1c 1b 67 50 ec
+}
+
+func benchmarkHashAlgo(b *testing.B, h hash.Hash) {
+	data := make([]byte, 2048)
+	rand.Read(data)
+
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		h.Write(data)
+		h.Sum(nil)
+	}
+}
+
+func BenchmarkWhirlpoolOrig(b *testing.B) {
+	benchmarkHashAlgo(b, jzw.New())
+}
+
+func BenchmarkWhirlpoolUnroll(b *testing.B) {
+	benchmarkHashAlgo(b, whirlpool.New())
 }
